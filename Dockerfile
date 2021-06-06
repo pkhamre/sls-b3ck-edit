@@ -5,9 +5,9 @@ RUN apk update &&\
     apk add --no-cache linux-headers alpine-sdk cmake tcl openssl-dev zlib-dev
 WORKDIR /tmp
 COPY . /tmp/srt-live-server/
-RUN git clone https://github.com/Haivision/srt.git
+RUN git clone -b 'v1.4.3' --single-branch --depth 1 https://github.com/Haivision/srt.git
 WORKDIR /tmp/srt
-RUN git checkout master && ./configure && make -j8 && make install
+RUN ./configure && make -j8 && make install
 WORKDIR /tmp/srt-live-server
 RUN make -j8
 
@@ -25,7 +25,7 @@ COPY --from=build /usr/local/lib64/libsrt* /usr/local/lib64/
 COPY --from=build /tmp/srt-live-server/bin/* /usr/local/bin/
 COPY sls.conf /etc/sls/
 VOLUME /logs
-EXPOSE 8181 30000/udp
+EXPOSE 8080 31400/udp
 USER srt
 WORKDIR /home/srt
 ENTRYPOINT [ "sls", "-c", "/etc/sls/sls.conf"]
